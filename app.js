@@ -15,6 +15,6 @@ app.use('/user', User)
 app.use(require('./middleware/validate-session'))
 app.use('/file', File)
 
-app.listen(3000, function(){
-    console.log('App is listening on 3000... Hopefully')
+app.listen(process.env.PORT, ()=>{
+    console.log(`App is listening on ${process.env.PORT}... Hopefully`)
 })
