@@ -3,11 +3,17 @@ module.exports = (sequelize, Sequelize)=>{
         type: {
             type:Sequelize.STRING
         },
+        title:{
+            type:Sequelize.STRING
+        },
         name:{
             type:Sequelize.STRING
         },
         data:{
             type:Sequelize.BLOB('long')
+        },
+        ownerId:{
+            type:Sequelize.INTEGER
         }
     })
      return File

@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes)=>{
             allowNull: false
         },
         role: {
-            type: DataTypes.STRING,
+            type: DataTypes.STRING
             // allowNull: false
         }
     })
