@@ -46,15 +46,15 @@ router.get('/all', (req,res)=>{
 router.get('/:id', (req,res)=>{
     File.findByPk(req.params.id)
     .then(file =>{
-        let fileContents = Buffer.from(file.data, 'base64')  
-        let readStream = new stream.PassThrough()        
-        readStream.end(fileContents)
+        // let fileContents = Buffer.from(file.data, 'base64')  
+        // let readStream = new stream.PassThrough()        
+        // readStream.end(fileContents)
         
-        res.set('Content-dispostion', 'attachment; filename='+file.name)
-        res.set('Content-Type', file.type) 
+        // res.set('Content-dispostion', 'attachment; filename='+file.name)
+        // res.set('Content-Type', file.type) 
 
-        readStream.pipe(res)
-        // res.status(200).json(file)
+        // readStream.pipe(res)
+        res.status(200).json(file)
     }).catch(err=>{
         res.status(401).json({msg: err})
     })
