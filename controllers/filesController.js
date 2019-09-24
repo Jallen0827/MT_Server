@@ -25,7 +25,7 @@ let upload = multer({
     storage: multerS3({
         s3: s3,
         bucket: 'ja-s3-aws-bucket',
-        ACL:'public-read-write',
+        acl:'public-read-write',
         metadata: function (req, file, cb) {
             cb(null, { fieldName: file.fieldname });
         },
