@@ -1,17 +1,12 @@
 //REQUIRED PACKAGES
 const router = require('express').Router()
 const multer = require('multer')
-const stream = require('stream')
-const path = require('path')
 const multerS3 = require('multer-s3')
-const fs = require('fs')
 const AWS = require('aws-sdk')
 
 //MODELS/MIDDLEWARE
-const File = require('../db').import('../models/file')
-const awsFile = require('../db').import('../models/awsFiles')
-const User = require('../db').import('../models/user')
-const validateSession = require('../middleware/validate-session')
+const awsFile = require('../db').import('../models/videos')
+const validateSession = require('../middleware/validate-session');
 
 //SETUP S3
 let s3 = new AWS.S3({
@@ -38,18 +33,24 @@ let upload = multer({
 // let storage = multer.memoryStorage()
 // let upload = multer({storage:storage})
 
-//UPLOAD SINGLE FILE/
-router.post('/upload', upload.single('file'), (req, res) => {
+//UPLOAD ARRAY OF FILES//
+router.post('/upload', validateSession, upload.array('file', 12), (req, res) => {
     console.log(req.body)
-    awsFile.create({
-        location: req.file.location,
-        title: req.body.title,
-        owner_id: req.user.id
-    })
+    console.log(req.files)
+    let filesArr = req.files
+    let rowArr = []
+    for (let i = 0; i < filesArr.length; i++){
+        rowArr.push({ 
+            location: filesArr[i].location,
+            title : filesArr[i].originalname,
+            owner_id: req.user.id
+        })
+    }
+
+    awsFile.bulkCreate(rowArr, {returning: true})
         .then(successData => res.status(200).json({ successData }))
         .catch(err => {
             res.status(500).json({ error: err })
-            console.log(err);
         })
 });
 
@@ -79,12 +80,9 @@ router.get('/all', (req,res)=>{
 })
 
 //UPDATE FILE
-router.put('/update/:id', upload.single('file'), (req,res)=>{
-    console.log(req.body);
+router.put('/update/:id', validateSession, (req,res)=>{
     awsFile.update({
-        location: req.file.location,
-        title: req.body.title,
-        owner_id: req.user.id
+        title: req.body.title
     }, {where: {id: req.params.id}})
     .then(data =>{
         res.status(200).json(data)
@@ -95,7 +93,7 @@ router.put('/update/:id', upload.single('file'), (req,res)=>{
 })
 
 //DELETE FILE/
-router.delete('/delete/:id', (req,res)=>{
+router.delete('/delete/:id', validateSession, (req,res)=>{
     awsFile.destroy({where:{id:req.params.id}})
     .then(data=>{
         res.status(200).json(data)
@@ -104,24 +102,5 @@ router.delete('/delete/:id', (req,res)=>{
         res.status(500).json({msg: err})
     })
 })
-
-//DOWNLOAD FILE
-// router.get('/:id', (req,res)=>{
-//     File.findByPk(req.params.id)
-//     .then(file =>{
-        
-//         let fileContents = Buffer.from(file.data, 'base64')         
-//         let readStream = new stream.PassThrough() 
-//         readStream.end(fileContents)
-        
-//         res.set('Content-dispostion', 'attachment; filename='+file.name)
-//         res.set('Content-Type', file.type) 
-
-//         readStream.pipe(res)
-//         // res.status(200).send(res)
-//     }).catch(err=>{
-//         res.status(401).json({msg: err})
-//     })
-// })
 
 module.exports = router;
