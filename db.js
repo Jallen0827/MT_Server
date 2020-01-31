@@ -13,4 +13,14 @@ sequelize.authenticate().then(
     }
 )
 
+Person = sequelize.import('./models/person')
+Videos = sequelize.import('./models/videos')
+Comments = sequelize.import('./models/comments')
+
+Videos.belongsTo(Person)
+Person.hasMany(Videos)
+
+Comments.belongsTo(Person)
+Person.hasMany(Comments)
+
 module.exports = sequelize

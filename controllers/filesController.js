@@ -6,6 +6,8 @@ const AWS = require('aws-sdk')
 
 //MODELS/MIDDLEWARE
 const awsFile = require('../db').import('../models/videos')
+const Person = require('../db').import('../models/person')
+const Comments = require('../db').import('../models/comments')
 const validateSession = require('../middleware/validate-session');
 
 //SETUP S3
@@ -32,6 +34,20 @@ let upload = multer({
 
 // let storage = multer.memoryStorage()
 // let upload = multer({storage:storage})
+
+//GET ALL VIDEO TITLES
+router.get('/titles', (req,res)=>{    
+        awsFile.findAll({
+            attributes: ['title']
+          })
+        .then(files=>{
+            res.status(200).json(files)
+        })
+        .catch(err=>{
+            res.status(401).json({msg: err})
+        })
+    
+})
 
 //UPLOAD ARRAY OF FILES//
 router.post('/upload', validateSession, upload.array('file', 12), (req, res) => {
@@ -76,6 +92,17 @@ router.get('/all', (req,res)=>{
     })
     .catch(err=>{
         res.status(401).json({msg: err})
+    })
+})
+
+//GET ALL BY PERSON ID
+router.get('/all/:id', (req,res)=>{
+    awsFile.findAll({where: {personId: req.params.id}})
+    .then(data =>{
+        res.status(200).json(data)
+    })
+    .catch(err=>{
+        res.status(500).send({msg:err})
     })
 })
 
