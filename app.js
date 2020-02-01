@@ -11,6 +11,13 @@ let sequelize= require('./db')
 sequelize.sync()
 app.use(express.json())
 
+app.get('/*', (req, res) => {
+    let url = path.join(__dirname, '../client/build', 'index.html');
+    if (!url.startsWith('/app/')) // we're on local windows
+      url = url.substring(1);
+    res.sendFile(url);
+  });
+
 app.use(require('./middleware/headers'))
 app.use('/user', User)
 
