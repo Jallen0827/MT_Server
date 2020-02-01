@@ -19,10 +19,6 @@ app.use('/file', File)
 app.use('/person', Person)
 app.use('/comments', Comments)
 
-app.get("/*", function (req, res) {
-    res.sendFile(path.resolve(__dirname, '../mt_client1/build', 'index.html'));
-})
-
 app.listen(process.env.PORT, ()=>{
     console.log(`App is listening on ${process.env.PORT}... Hopefully`)
 })
